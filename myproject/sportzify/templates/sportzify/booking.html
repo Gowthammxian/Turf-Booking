@@ -1,0 +1,562 @@
+{% if message %}
+<script>
+  alert('{{message}}')
+</script>
+{% endif %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-GLhlTQ8iRABdZLl6O3oVMWSktQOp6b7In1Zl3/Jr59b6EGGoI1aFkw7cmDA6j6gD" crossorigin="anonymous">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-w76AqPfDkMBDXo30jS1Sgez6pr3x5MlQ1ZAGC+nuZB+EYdgRZgiwxhTBTkF7CXvN"
+    crossorigin="anonymous"></script>
+</head>
+
+<body>
+  {% load static %}
+  <nav class="navbar navbar-expand-lg navbar-light ">
+    <a class="navbar-brand" href="{% url 'basketball' %}">
+			<img src="{% static 'images/images/logo3.jpg' %}" alt="Sportzify logo" width="50" height="40">
+		  </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+      aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only"></span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'About' %}">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">All Turf</a>
+        </li>
+      </ul>
+    </div>
+
+  </nav>
+  <div class="card float-end" id="card">
+    <h3>Total: {{total}} </h3>
+    <a href="{% url 'payment' turf_uid uid total %}" class="btn btn-danger">PAY</a>
+  </div>
+  <div id="box">
+    <div class="container-fluid px-1 py-5 mx-auto">
+      <div class="row d-flex justify-content-center">
+
+        <div class="col-xl-7 col-lg-8 col-md-9 col-11 text-center">
+          <h3>Booking Details</h3>
+          <div class="card">
+            <!-- <h5 class="text-center mb-4">Detail for Booking Turf</h5> -->
+            <form class="form-card" method="POST">
+              {% csrf_token %}
+              <div class="row justify-content-between text-left">
+                <div class="form-group col-sm-6 flex-column d-flex"> <label
+                    class="form-control-label px-3">Truf_Name<span class="text-danger"> </span></label> <input
+                    type="text" id="fname" value="{{turf_details.turf_name}}" name="t_name"> </div>
+                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Address<span
+                      class="text-danger"> </span></label> <input type="text" id="lname" name="t_address"
+                    value="{{turf_details.turf_address}}"> </div>
+              </div>
+              <div class="row justify-content-between text-left">
+                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Customer
+                    Name<span class="text-danger"> </span></label> <input type="text" id="email"
+                    value={{customer_details.username}} name="custname"> </div>
+                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">No.of
+                    Persons<span class="text-danger"></span></label> <input type="number" id="mob" name="persons">
+                </div>
+              </div>
+              <div class="row justify-content-between text-left">
+                <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Date<span
+                      class="text-danger"> </span></label> <input type="date" id="date" name="date"> <button type="button" class="btn btn-success" id="fetch_btn">Get Time Slots</button></div>
+                      
+                      
+
+                <!-- <input type="text" id="hidden-date-value" value=""> -->
+
+                <label for="cars">Choose a Time:</label>
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <div class="grid-container timeslot">
+
+                  </div>
+                </div>
+
+
+
+              </div>
+              <!-- <div class="row justify-content-between text-left">
+                            <div class="form-group col-sm-6 flex-column d-flex"> <label class="form-control-label px-3">Time Slot<span class="text-danger"> *</span></label> <input type="text" id="job" name="job"> </div>
+                        </div> -->
+              <div class="row justify-content-between text-left">
+                <!-- <div class="form-group col-12 flex-column d-flex"> <label class="form-control-label px-3">Description<span class="text-danger"> </span></label> <input type="text" id="ans" name="ans"> </div> -->
+              </div>
+              <div class="row justify-content-end">
+                <div class="form-group col-sm-12" id="submit"> <input type="submit" value="BOOK"
+                    class="btn-block btn-primary submitBtn">
+                </div>
+              </div>
+
+            </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+
+
+
+  </div>
+  <script>
+    const button = document.querySelector('#fetch_btn');
+    button.addEventListener('click', myFunction);
+    
+    function myFunction() {
+    
+      var dateField = document.getElementById("date");
+      var dateValue = dateField.value;
+      console.log(dateValue);
+
+      var timeList = {{ time_list|safe }};
+      var timeslotDiv = document.querySelector(".timeslot");
+      
+      
+      var timeslotElements = document.querySelectorAll(".timeslot label");
+      timeslotElements.forEach(function (element) {
+        
+        element.remove();
+      }
+      );
+
+      var timeslotElement = document.querySelector(".btn-outline-danger");
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("09:00 TO 10:00 AM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "09:00 TO 10:00 AM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("09:00 TO 10:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "09:00 TO 10:00 AM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("09:00 TO 10:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("10:00 TO 11:00 AM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "10:00 TO 11:00 AM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("10:00 AM TO 11:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "10:00 TO 11:00 AM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("10:00 AM TO 11:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("11:00 TO 12:00 AM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "11:00 TO 12:00 AM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("11:00 TO 12:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "11:00 TO 12:00 AM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("11:00 TO 12:00 AM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+      
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("12:00 TO 01:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "12:00 TO 01:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("12:00 TO 01:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "12:00 TO 01:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("12:00 TO 01:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("01:00 TO 02:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "01:00 TO 02:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("01:00 TO 02:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "01:00 TO 02:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("01:00 TO 02:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("02:00 TO 03:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "02:00 TO 03:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("02:00 TO 03:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "02:00 TO 03:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("02:00 TO 03:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("03:00 TO 04:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "03:00 TO 04:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("03:00 TO 04:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "03:00 TO 04:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("03:00 TO 04:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("04:00 TO 05:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "04:00 TO 05:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("04:00 TO 05:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "04:00 TO 05:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("04:00 TO 05:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("05:00 TO 06:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "05:00 TO 06:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("05:00 TO 06:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "05:00 TO 06:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("05:00 TO 06:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("06:00 TO 07:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "06:00 TO 07:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("06:00 TO 07:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "06:00 TO 07:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("06:00 TO 07:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("07:00 TO 08:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "07:00 TO 08:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("07:00 TO 08:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "07:00 TO 08:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("07:00 TO 08:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+      
+
+      if (!timeslotElement) {
+        // time slot element hasn't been created yet
+        if (timeList.includes("08:00 TO 09:00 PM" + dateValue)) {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-danger");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "08:00 TO 09:00 PM";
+          inputElement.disabled = true;
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("08:00 TO 09:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        } else {
+          var labelElement = document.createElement("label");
+          labelElement.classList.add("btn", "btn-outline-success");
+          var inputElement = document.createElement("input");
+          inputElement.type = "checkbox";
+          inputElement.name = "time";
+          inputElement.value = "08:00 TO 09:00 PM";
+          labelElement.appendChild(inputElement);
+          labelElement.appendChild(document.createTextNode("08:00 TO 09:00 PM"));
+          timeslotDiv.appendChild(labelElement);
+        }
+      }
+
+     ;
+ 
+    }
+  </script>
+
+
+
+
+
+
+  <!-- <script>
+    const box=document.querySelector('#box')
+    const card=document.querySelector('#card')
+    const submit=document.querySelector('#submit')
+
+    window.onload=()=>{
+      box.style.display='block'
+      card.style.display='none'
+    }
+
+    submit.addEventListener('click',()=>{
+      card.style.display='block'
+      box.style.display='none'
+    })
+    
+  </script> -->
+
+  <style>
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      /* create 2 columns */
+      grid-gap: 10px;
+      /* add a gap between the labels */
+    }
+
+    .navbar {
+      background-color: #7CDF64;
+
+    }
+
+    body {
+      color: #000;
+      overflow-x: hidden;
+      height: 100%;
+      background-image: url("https://i.imgur.com/GMmCQHC.png");
+      background-repeat: no-repeat;
+      background-size: 100% 100%
+    }
+
+    .card {
+      padding: 30px 40px;
+      margin-top: 60px;
+      margin-bottom: 60px;
+      border: none !important;
+      box-shadow: 0 6px 12px 0 rgba(0, 0, 0, 0.2)
+    }
+
+    .blue-text {
+      color: #00BCD4
+    }
+
+    .form-control-label {
+      margin-bottom: 0
+    }
+
+    input,
+    textarea,
+    button {
+      padding: 8px 15px;
+      border-radius: 5px !important;
+      margin: 5px 0px;
+      box-sizing: border-box;
+      border: 1px solid rgb(8, 219, 57);
+      font-size: 18px !important;
+      font-weight: 300
+    }
+
+    input:focus,
+    textarea:focus {
+      -moz-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+      border: 1px solid #1fd85a;
+      outline-width: 0;
+      font-weight: 400
+    }
+
+    .btn-block {
+      text-transform: uppercase;
+      font-size: 15px !important;
+      font-weight: 400;
+      height: 43px;
+      cursor: pointer
+    }
+
+    .btn-block:hover {
+      color: rgb(9, 243, 13) !important
+    }
+
+    button:focus {
+      -moz-box-shadow: none !important;
+      -webkit-box-shadow: none !important;
+      box-shadow: none !important;
+      outline-width: 0
+    }
+  </style>
+</body>
+
+</html>

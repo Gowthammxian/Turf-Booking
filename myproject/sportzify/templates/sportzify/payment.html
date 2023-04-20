@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .center {
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+    }
+</style>
+</head>
+<body>
+  <div style="text-align: center;margin-top:30px;">
+    <img src="data:image/png;base64,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" alt="razor pay" width="300" height="200">
+    </div>
+    <div style="text-align: center;">
+      <h3>Pay using RazorPay Gateway</h3>
+      </div>
+      <!-- <div style="text-align: center;">
+      <button id="rzp-button1">Pay</button>
+    </div>  -->
+<!-- <script src="https://checkout.razorpay.com/v1/checkout.js"></script> -->
+
+<div class="center">
+
+  <form class="text-center border border-light p-5" action="{% url 'success' %}" method="POST">
+      {% csrf_token %}
+
+      <!-- <p class="h3 mb-3"><i class="fas fa-coffee"></i> BUY ME A COFFEE!!</p>
+      <p class="mb-3">Help us create more videos by donating 500 INR</p>
+
+      <input type="name" name="name" id="name" required class="form-control mb-4" placeholder="Name"> -->
+
+      <!-- RAZORPAY INTEGRATION HERE -->
+      <script src="https://checkout.razorpay.com/v1/checkout.js" data-key="rzp_test_d8KZMdlY59Fi22"
+          data-amount="{{total}}" data-currency="INR" data-order_id="{{payment.id}}" data-buttontext="Pay with Razorpay"
+          data-name="Sportzify" data-description="Django and Data Science"
+          data-image="https://example.com/your_logo.jpg" data-prefill.name="PC" data-prefill.email="pc@studygyaan.com"
+          data-theme.color="#0077be"></script>
+  </form>
+
+</div>
+
+
+</body>
+</html>
